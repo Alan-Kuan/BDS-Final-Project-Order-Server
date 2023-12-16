@@ -1,20 +1,10 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-
-class Customer(BaseModel):
-    name: str
-    addr: str
-    phone: str
-    email: str | None = None
-
-class Order(BaseModel):
-    desc: str
-    img_uri: str
-    customer: Customer
+from modules.specs import Order
+from modules.db import insert_order
 
 app = FastAPI()
 
 @app.post("/order")
 async def create_order(order: Order):
-    # TODO: add to a db
+    insert_order(order)
     return order
