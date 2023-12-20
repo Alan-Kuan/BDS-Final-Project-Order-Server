@@ -5,3 +5,6 @@ db = TinyDB('db.json')
 
 def insert_order(order: Order):
     db.insert(order.model_dump())
+
+def get_all_orders():
+    return db.all()
