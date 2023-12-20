@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+from fastapi.responses import HTMLResponse, FileResponse
+from os import path
 import sys
 import uvicorn
 
@@ -7,6 +9,8 @@ from modules.specs import Order
 from modules.db import insert_order, get_all_orders
 
 if __name__ == '__main__':
+    root = path.dirname(path.abspath(__file__))
+
     if len(sys.argv) == 1 or len(sys.argv) > 3:
         print(f'Usage: {sys.argv[0]} <dev|prod> [domain name]')
         exit(1)
@@ -23,12 +27,22 @@ if __name__ == '__main__':
 
     app = FastAPI()
 
-    @app.post('/order')
+    @app.get('/', response_class=HTMLResponse)
+    async def get_home_page():
+        with open(path.join(root, 'index.html')) as f:
+            html = f.read()
+        return html
+
+    @app.get('/no-preview.png', response_class=FileResponse)
+    async def get_no_preview_image():
+        return FileResponse('assets/no-preview.png')
+
+    @app.post('/api/v1/order')
     async def create_order(order: Order):
         insert_order(order)
         return order
 
-    @app.get('/order')
+    @app.get('/api/v1/order')
     async def get_order():
         return get_all_orders()
 

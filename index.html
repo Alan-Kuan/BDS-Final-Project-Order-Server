@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Smartphone Cover Orders</title>
+
+        <style>
+            body {
+                width: 70%;
+                margin: 2rem auto;
+                font-size: 16px;
+            }
+            .order-card {
+                display: flex;
+                flex-direction: row;
+                margin: 1rem;
+                padding: 0.5rem;
+                box-shadow: 1px 1px 5px #555555;
+            }
+            .order-card img {
+                width: 10rem;
+                margin-right: 1rem;
+                background-image: url('/no-preview.png');
+            }
+            ul {
+                margin: 0.5rem 0 0 0;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="module">
+            import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js';
+
+            createApp({
+                setup() {
+                    const orders = ref([]);
+                    return { orders };
+                },
+                async mounted() {
+                    this.orders = await fetch('/api/v1/order')
+                        .then(res => res.json())
+                        .catch(err => {
+                            console.error(err);
+                            return [];
+                        });
+                },
+            }).mount('#app');
+        </script>
+
+        <div id="app">
+            <h1>Smartphone Cover Orders</h1>
+            <div
+              v-for="order in orders"
+              class="order-card"
+            >
+                <div>
+                    <a :href="order.img_uri">
+                        <img :src="order.img_uri" />
+                    </a>
+                </div>
+                <div>
+                    <span>{{ order.desc }}</span>
+                    <ul>
+                        <li><strong>Customer</strong>: {{ order.customer.name }}</li>
+                        <li><strong>Address</strong>: {{ order.customer.addr }}</li>
+                        <li><strong>Phone</strong>: {{ order.customer.phone }}</li>
+                        <li><strong>E-mail</strong>: {{ order.customer.email }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
